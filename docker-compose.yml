@@ -1,5 +1,5 @@
 services:
-  api-db:
+  postgres:
     image: postgres:17.2-alpine
     restart: unless-stopped
     ports:
@@ -9,11 +9,11 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: vyhul
+      POSTGRES_DB: davidp
     networks:
       - default
 
-  api-redis:
+  redis:
     image: redis:7.4.1-alpine
     restart: unless-stopped
     ports:

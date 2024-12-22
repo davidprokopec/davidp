@@ -1,4 +1,4 @@
-.PHONY: dev up stop down
+.PHONY: dev up stop down clear-db
 
 default:
 	cat Makefile
@@ -14,6 +14,9 @@ stop:
 
 down:
 	docker compose -f docker-compose.yml down
+
+clear-db:
+	docker compose -f docker-compose.yml down && docker volume rm davidp_postgres-data && docker compose -f docker-compose.yml up -d
 
 clean:
 	rm -rf ./node_modules

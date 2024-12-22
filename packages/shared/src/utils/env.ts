@@ -5,15 +5,20 @@ const baseSchema = z.object({
   PORT: z.coerce.number(),
 })
 
-export function getEnv<T extends z.ZodObject<z.ZodRawShape>>(
+export function getEnv<
+  T extends z.ZodObject<z.ZodRawShape>,
+  C extends z.ZodObject<z.ZodRawShape> | undefined = undefined,
+>(
   schema: T,
-): z.infer<typeof baseSchema> & z.infer<T> {
-  const envSchema = schema.merge(baseSchema) as z.ZodType<z.infer<typeof baseSchema> & z.infer<T>>
-  const env = envSchema.safeParse(process.env)
+  { source, customBase }: { source?: NodeJS.ProcessEnv; customBase?: C } = {},
+): C extends z.ZodObject<z.ZodRawShape> ? z.infer<C> : z.infer<typeof baseSchema> & z.infer<T> {
+  const envSchema =
+    customBase || (schema.merge(baseSchema) as z.ZodType<z.infer<typeof baseSchema> & z.infer<T>>)
+  const env = envSchema.safeParse(source || process.env)
   if (!env.success) {
     console.error('error while parsing env', env.error)
     process.exit(0)
     return
   }
-  return env.data
+  return env.data as any
 }

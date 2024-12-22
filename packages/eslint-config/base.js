@@ -23,6 +23,7 @@ export const config = [
       "prettier/prettier": "warn",
       "turbo/no-undeclared-env-vars": "warn",
       "no-unused-vars": "off",
+      // 'sort-imports': 'warn',
     },
   },
   ...tseslint.configs.recommended,
