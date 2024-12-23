@@ -98,8 +98,8 @@ export function AuthSection() {
   return (
     <div className="space-x-2">
       <Link
-        to="/auth"
-        search={{ mode: 'login' }}
+        to="/auth/$mode"
+        params={{ mode: 'login' }}
         activeProps={{
           className: 'font-bold',
         }}
@@ -109,8 +109,8 @@ export function AuthSection() {
         </Button>
       </Link>
       <Link
-        to="/auth"
-        search={{ mode: 'signup' }}
+        to="/auth/$mode"
+        params={{ mode: 'signup' }}
         activeProps={{
           className: 'font-bold',
         }}

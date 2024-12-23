@@ -4,7 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute('/')({
   component: HomeComponent,
   loader: () => {
-    document.title = 'home'
+    document.title = 'domof'
   },
 })
 

@@ -1,38 +1,40 @@
-'use client'
-
 import * as React from 'react'
+import { useAuth } from '@/hooks/useAuth'
+import { useSession } from '@/hooks/useSession'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useSpring, animated } from 'react-spring'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Mail } from 'lucide-react'
 import { Github } from '@/components/icons/github'
-import { z } from 'zod'
 import { Facebook } from '@/components/icons/facebook'
-import { useSpring, animated } from 'react-spring'
 import { Google } from '@/components/icons/google'
-import { useSession } from '@/hooks/useSession'
-import { useAuth } from '@/hooks/useAuth'
+import { Mail } from 'lucide-react'
 
 const authPageSearchSchema = z.object({
   mode: z.enum(['signup', 'login']).optional().default('login'),
 })
 
-type AuthPageSearch = z.infer<typeof authPageSearchSchema>
-
-export const Route = createFileRoute('/auth')({
-  component: AuthPage,
-  validateSearch: (search) => authPageSearchSchema.parse(search),
+export const Route = createFileRoute('/auth/$mode')({
+  component: RouteComponent,
+  loader: ({ params }) => {
+    const { mode } = authPageSearchSchema.parse(params)
+    return { mode }
+  },
 })
 
-export default function AuthPage() {
-  const { mode } = Route.useParams()
-  const searchParams = Route.useSearch()
+function RouteComponent() {
+  const { mode } = Route.useLoaderData()
   const navigate = useNavigate()
-  const isSignUp = searchParams.mode === 'signup'
+  const [isSignUp, setIsSignUp] = React.useState(mode === 'signup')
   const { data: session, isPending } = useSession()
   const { signIn, signUp, socialSignIn } = useAuth()
+
+  React.useEffect(() => {
+    setIsSignUp(mode === 'signup')
+  }, [mode])
 
   const [formData, setFormData] = React.useState({
     email: '',
@@ -48,8 +50,8 @@ export default function AuthPage() {
 
   const toggleMode = () => {
     navigate({
-      to: `/auth`,
-      search: { mode: isSignUp ? 'login' : 'signup' },
+      to: `/auth/$mode`,
+      params: { mode: isSignUp ? 'login' : 'signup' },
       replace: true,
     })
   }
@@ -74,12 +76,12 @@ export default function AuthPage() {
   }
 
   React.useEffect(() => {
-    if (searchParams.mode === 'signup') {
+    if (isSignUp) {
       document.title = 'Sign Up'
     } else {
       document.title = 'Sign In'
     }
-  }, [searchParams.mode])
+  }, [isSignUp])
 
   React.useEffect(() => {
     if (session) {
@@ -95,9 +97,7 @@ export default function AuthPage() {
         <animated.div style={slideProps} className="flex w-[200%]">
           <CardContent className="w-1/2 p-6">
             <CardHeader className="p-0 mb-6">
-              <CardTitle className="text-2xl font-bold text-center">
-                Sign In
-              </CardTitle>
+              <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
             </CardHeader>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">
@@ -125,11 +125,7 @@ export default function AuthPage() {
                   required
                 />
               </div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={signIn.isPending}
-              >
+              <Button type="submit" className="w-full" disabled={signIn.isPending}>
                 {signIn.isPending ? 'Signing in...' : 'Sign in with Email'}
               </Button>
             </form>
@@ -139,9 +135,7 @@ export default function AuthPage() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
+                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
               </div>
             </div>
 
@@ -180,9 +174,7 @@ export default function AuthPage() {
           </CardContent>
           <CardContent className="w-1/2 p-6">
             <CardHeader className="p-0 mb-6">
-              <CardTitle className="text-2xl font-bold text-center">
-                Create an account
-              </CardTitle>
+              <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
             </CardHeader>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid gap-4 grid-cols-2">
@@ -234,11 +226,7 @@ export default function AuthPage() {
                   required
                 />
               </div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={signUp.isPending}
-              >
+              <Button type="submit" className="w-full" disabled={signUp.isPending}>
                 {signUp.isPending ? 'Creating account...' : 'Create account'}
               </Button>
             </form>
