@@ -8,7 +8,8 @@
     ".": "./src/index.ts"
   },
   "devDependencies": {
-    "@types/bun": "^1.1.14"
+    "@types/bun": "^1.1.14",
+    "elysia": "^1.2.2"
   },
   "peerDependencies": {
     "@repo/eslint-config": "*",
@@ -16,7 +17,6 @@
   },
   "dependencies": {
     "@elysiajs/eden": "^1.2.0",
-    "@repo/api": "*",
-    "elysia": "^1.2.2"
+    "@repo/api": "*"
   }
 }

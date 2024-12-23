@@ -18,7 +18,6 @@ export const auth = betterAuth({
           tokenUrl: 'https://login.szn.cz/api/v1/oauth/token',
           userInfoUrl: 'https://login.szn.cz/api/v1/user',
           redirectURI: 'http://localhost:3000/api/auth/oauth2/callback/seznam',
-          prompt: 'consent',
           scopes: ['identity', 'avatar'],
           mapProfileToUser: (profile) => {
             console.log(profile)

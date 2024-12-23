@@ -11,7 +11,7 @@ import { queryClient } from '@/lib/query-client'
 export const Route = createFileRoute('/blog')({
   component: RouteComponent,
   loader: async () => {
-    const blogs = await apiFetch('/api/blog', {})
+    const blogs = await api.blog.index.get()
     console.log(blogs)
   },
 })

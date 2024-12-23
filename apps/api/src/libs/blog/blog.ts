@@ -3,8 +3,9 @@ import db, { blogSchema, schema } from '../../db'
 import { eq } from 'drizzle-orm'
 import { userMiddleware } from '../../middlewares/auth-middleware'
 
-export const blog = new Elysia({ prefix: '/api/blog' })
+export const blog = new Elysia({ prefix: '/blog' })
   .get('/', async () => {
+    console.log('hello')
     const posts = await db.select().from(blogSchema.blog)
     return posts
   })
