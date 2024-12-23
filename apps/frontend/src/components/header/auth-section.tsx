@@ -10,8 +10,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
-import { LogOut, Settings, User } from 'lucide-react'
+import { Eye, LogOut, Settings, User } from 'lucide-react'
 import { Button } from '../ui/button'
+import { Badge } from '../ui/badge'
 
 export function AuthSection() {
   const { data: session, isPending, error } = authClient.useSession()
@@ -33,7 +34,7 @@ export function AuthSection() {
                   alt={session.user.name}
                   className="rounded-full"
                 />
-                <AvatarFallback>PROFILE</AvatarFallback>
+                <AvatarFallback>tvuj profil</AvatarFallback>
               </Avatar>
             </div>
           </DropdownMenuTrigger>
@@ -45,24 +46,34 @@ export function AuthSection() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            {session.user.role === 'admin' && (
+              <Link to="/admin">
+                <DropdownMenuItem>
+                  <Eye className="mr-2 h-4 w-4" />
+                  <span>admin</span>
+                </DropdownMenuItem>
+              </Link>
+            )}
             <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
+              <span>TODO Profil</span>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
+              <span>TODO Nastaveni</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOut}>
               <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
+              <span>odhlas me PROSIM</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
     )
   }
+
+  if (isPending) return <div></div>
 
   return (
     <div className="space-x-2">

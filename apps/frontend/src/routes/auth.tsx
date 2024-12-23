@@ -31,7 +31,7 @@ export default function AuthPage() {
   const searchParams = Route.useSearch()
   const navigate = useNavigate()
   const isSignUp = searchParams.mode === 'signup'
-  const { data: session } = authClient.useSession()
+  const { data: session, isPending } = authClient.useSession()
 
   const slideProps = useSpring({
     transform: isSignUp ? 'translateX(-50%)' : 'translateX(0%)',
@@ -59,6 +59,8 @@ export default function AuthPage() {
       navigate({ to: '/', replace: true })
     }
   }, [session, navigate])
+
+  if (isPending) return <div></div>
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

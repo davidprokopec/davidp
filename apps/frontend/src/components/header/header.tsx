@@ -19,7 +19,7 @@ export function Header() {
               activeOptions={{ exact: true }}
               className="hover:text-gray-600"
             >
-              Home
+              O necem
             </Link>
           </li>
           <li>
@@ -31,19 +31,7 @@ export function Header() {
               activeOptions={{ exact: true }}
               className="hover:text-gray-600"
             >
-              About
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/"
-              activeProps={{
-                className: 'font-bold',
-              }}
-              activeOptions={{ exact: true }}
-              className="hover:text-gray-600"
-            >
-              Blog
+              blog posty
             </Link>
           </li>
         </ul>

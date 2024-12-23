@@ -4,6 +4,7 @@ import { migrateDb, schema } from './db'
 import cors from '@elysiajs/cors'
 import swagger from '@elysiajs/swagger'
 import betterAuthView from './libs/auth/auth-view'
+import { auth } from './libs/auth/auth'
 
 if (env.MIGRATE_DB) {
   await migrateDb()
