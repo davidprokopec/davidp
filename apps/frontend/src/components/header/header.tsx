@@ -24,7 +24,7 @@ export function Header() {
           </li>
           <li>
             <Link
-              to="/"
+              to="/blog"
               activeProps={{
                 className: 'font-bold',
               }}

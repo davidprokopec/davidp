@@ -9,5 +9,6 @@ export const MutationKeys = {
     signUp: ['auth', 'signUp'] as const,
     signOut: ['auth', 'signOut'] as const,
     socialSignIn: ['auth', 'socialSignIn'] as const,
+    oauth2: ['authl', 'oathu2'] as const,
   },
 } as const
