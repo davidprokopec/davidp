@@ -12,9 +12,8 @@ import { z } from 'zod'
 import { Facebook } from '@/components/icons/facebook'
 import { useSpring, animated } from 'react-spring'
 import { Google } from '@/components/icons/google'
-import { authClient } from '@/lib/auth-client'
-import env from '@/utils/env'
-import { searchForWorkspaceRoot } from 'vite'
+import { useSession } from '@/hooks/useSession'
+import { useAuth } from '@/hooks/useAuth'
 
 const authPageSearchSchema = z.object({
   mode: z.enum(['signup', 'login']).optional().default('login'),
@@ -31,7 +30,15 @@ export default function AuthPage() {
   const searchParams = Route.useSearch()
   const navigate = useNavigate()
   const isSignUp = searchParams.mode === 'signup'
-  const { data: session, isPending } = authClient.useSession()
+  const { data: session, isPending } = useSession()
+  const { signIn, signUp, socialSignIn } = useAuth()
+
+  const [formData, setFormData] = React.useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+  })
 
   const slideProps = useSpring({
     transform: isSignUp ? 'translateX(-50%)' : 'translateX(0%)',
@@ -44,6 +51,25 @@ export default function AuthPage() {
       search: { mode: isSignUp ? 'login' : 'signup' },
       replace: true,
     })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (isSignUp) {
+      signUp.mutate(formData)
+    } else {
+      signIn.mutate({
+        email: formData.email,
+        password: formData.password,
+      })
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value,
+    }))
   }
 
   React.useEffect(() => {
@@ -70,24 +96,34 @@ export default function AuthPage() {
             <CardHeader className="p-0 mb-6">
               <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
             </CardHeader>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">
-                <Label htmlFor="email-signin">Email</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="email-signin"
+                  id="email"
                   placeholder="name@example.com"
                   type="email"
                   autoCapitalize="none"
                   autoComplete="email"
                   autoCorrect="off"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password-signin">Password</Label>
-                <Input id="password-signin" type="password" autoComplete="current-password" />
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
-              <Button type="submit" className="w-full">
-                Sign in with Email
+              <Button type="submit" className="w-full" disabled={signIn.isPending}>
+                {signIn.isPending ? 'Signing in...' : 'Sign in with Email'}
               </Button>
             </form>
 
@@ -104,7 +140,8 @@ export default function AuthPage() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => authClient.signIn.social({ provider: 'github' })}
+                onClick={() => socialSignIn.mutate({ provider: 'github' })}
+                disabled={socialSignIn.isPending}
               >
                 <Github className="mr-2 h-4 w-4 stroke-white fill-white" />
                 Github
@@ -136,38 +173,58 @@ export default function AuthPage() {
             <CardHeader className="p-0 mb-6">
               <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
             </CardHeader>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid gap-4 grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">First name</Label>
-                  <Input id="firstName" placeholder="John" autoComplete="given-name" />
+                  <Input
+                    id="firstName"
+                    placeholder="John"
+                    autoComplete="given-name"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Last name</Label>
-                  <Input id="lastName" placeholder="Doe" autoComplete="family-name" />
+                  <Input
+                    id="lastName"
+                    placeholder="Doe"
+                    autoComplete="family-name"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email-signup">Email</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="email-signup"
+                  id="email"
                   placeholder="name@example.com"
                   type="email"
                   autoCapitalize="none"
                   autoComplete="email"
                   autoCorrect="off"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password-signup">Password</Label>
-                <Input id="password-signup" type="password" autoComplete="new-password" />
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm password</Label>
-                <Input id="confirmPassword" type="password" autoComplete="new-password" />
-              </div>
-              <Button type="submit" className="w-full">
-                Create account
+              <Button type="submit" className="w-full" disabled={signUp.isPending}>
+                {signUp.isPending ? 'Creating account...' : 'Create account'}
               </Button>
             </form>
             <div className="mt-4 text-center">

@@ -12,36 +12,56 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import { Eye, LogOut, Settings, User } from 'lucide-react'
 import { Button } from '../ui/button'
-import { Badge } from '../ui/badge'
+import { useSession } from '@/hooks/useSession'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { QueryKeys, MutationKeys } from '@/lib/query-keys'
 
 export function AuthSection() {
-  const { data: session, isPending, error } = authClient.useSession()
+  const { data: session, isPending, error } = useSession()
+  const queryClient = useQueryClient()
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false)
 
-  const signOut = () => {
-    authClient.signOut()
-  }
+  const signOutMutation = useMutation({
+    mutationKey: MutationKeys.auth.signOut,
+    mutationFn: () => authClient.signOut(),
+    onSuccess: () => {
+      queryClient.setQueryData(QueryKeys.session, null)
+      queryClient.invalidateQueries({ queryKey: QueryKeys.session })
+    },
+  })
 
-  if (session) {
+  if (session?.user) {
+    const userInitials = session.user.name
+      ? session.user.name
+          .split(' ')
+          .map((n) => n[0])
+          .join('')
+          .toUpperCase()
+      : (session.user.email?.[0]?.toUpperCase() ?? 'U')
+
+    const displayName = session.user.name || session.user.email || 'User'
+
     return (
       <div>
         <DropdownMenu>
           <DropdownMenuTrigger className="focus:outline-none">
             <div className="w-10 h-10 rounded-full select-none">
               <Avatar className="h-10 w-10 cursor-pointer rounded-full">
-                <AvatarImage
-                  src={session.user.image!}
-                  alt={session.user.name}
-                  className="rounded-full"
-                />
-                <AvatarFallback>tvuj profil</AvatarFallback>
+                {session.user.image ? (
+                  <AvatarImage
+                    src={session.user.image}
+                    alt={displayName}
+                    className="rounded-full"
+                  />
+                ) : null}
+                <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{session.user.name}</p>
+                <p className="text-sm font-medium leading-none">{displayName}</p>
                 <p className="text-xs leading-none text-muted-foreground">{session.user.email}</p>
               </div>
             </DropdownMenuLabel>
@@ -63,7 +83,7 @@ export function AuthSection() {
               <span>TODO Nastaveni</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={signOut}>
+            <DropdownMenuItem onClick={() => signOutMutation.mutate()}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>odhlas me PROSIM</span>
             </DropdownMenuItem>

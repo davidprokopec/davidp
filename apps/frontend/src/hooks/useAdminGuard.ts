@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { authClient } from '@/lib/auth-client'
+import { useSession } from './useSession'
 
 export function useAdminGuard() {
-  const { data: session, isPending } = authClient.useSession()
+  const { data: session, isPending } = useSession()
   const navigate = useNavigate()
 
   React.useEffect(() => {
