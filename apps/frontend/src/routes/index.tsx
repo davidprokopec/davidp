@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Button } from '@repo/ui/button'
 
 export const Route = createFileRoute('/')({
   component: HomeComponent,
@@ -10,9 +9,5 @@ export const Route = createFileRoute('/')({
 })
 
 function HomeComponent() {
-  return (
-    <div className="max-w-2xl mx-auto mt-5">
-      grc w
-    </div>
-  )
+  return <div className="max-w-2xl mx-auto mt-5">grc w</div>
 }

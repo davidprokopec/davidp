@@ -27,6 +27,7 @@ export const Route = createFileRoute('/auth')({
 })
 
 export default function AuthPage() {
+  const { mode } = Route.useParams()
   const searchParams = Route.useSearch()
   const navigate = useNavigate()
   const isSignUp = searchParams.mode === 'signup'
@@ -94,7 +95,9 @@ export default function AuthPage() {
         <animated.div style={slideProps} className="flex w-[200%]">
           <CardContent className="w-1/2 p-6">
             <CardHeader className="p-0 mb-6">
-              <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
+              <CardTitle className="text-2xl font-bold text-center">
+                Sign In
+              </CardTitle>
             </CardHeader>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">
@@ -122,7 +125,11 @@ export default function AuthPage() {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={signIn.isPending}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={signIn.isPending}
+              >
                 {signIn.isPending ? 'Signing in...' : 'Sign in with Email'}
               </Button>
             </form>
@@ -132,7 +139,9 @@ export default function AuthPage() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
               </div>
             </div>
 
@@ -171,7 +180,9 @@ export default function AuthPage() {
           </CardContent>
           <CardContent className="w-1/2 p-6">
             <CardHeader className="p-0 mb-6">
-              <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
+              <CardTitle className="text-2xl font-bold text-center">
+                Create an account
+              </CardTitle>
             </CardHeader>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid gap-4 grid-cols-2">
@@ -223,7 +234,11 @@ export default function AuthPage() {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={signUp.isPending}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={signUp.isPending}
+              >
                 {signUp.isPending ? 'Creating account...' : 'Create account'}
               </Button>
             </form>
