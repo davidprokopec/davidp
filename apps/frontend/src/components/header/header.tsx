@@ -4,10 +4,10 @@ import { Link } from '@tanstack/react-router'
 
 export function Header() {
   return (
-    <header className="bg-white shadow-sm dark:bg-gray-900 dark:text-white h-16">
-      <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
+    <header className="bg-white shadow-sm dark:bg-gray-900 dark:text-white">
+      <nav className="container mx-auto px-4 py-4 flex justify-between items-center h-16">
         <Link href="/" className="text-xl font-semibold">
-          Your Name
+          DavidP
         </Link>
         <ul className="flex space-x-4">
           <li>
