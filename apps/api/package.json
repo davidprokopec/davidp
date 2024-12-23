@@ -1,20 +1,21 @@
 {
-  "name": "api",
+  "name": "@repo/api",
   "version": "1.0.0",
+  "main": "./src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
     "generate-migration": "bun drizzle-kit generate"
   },
   "dependencies": {
-    "@elysiajs/cors": "^1.1.1",
-    "@elysiajs/swagger": "^1.1.6",
+    "@elysiajs/cors": "^1.2.0",
+    "@elysiajs/swagger": "^1.2.0",
     "@repo/drizzle-cuid": "*",
     "@repo/shared": "*",
     "better-auth": "^1.1.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.2",
-    "elysia": "latest",
+    "elysia": "^1.2.2",
     "pg": "^8.13.1",
     "zod": "^3.24.1"
   },

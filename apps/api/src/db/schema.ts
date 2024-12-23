@@ -1,8 +1,10 @@
 import { cuid2 } from '@repo/drizzle-cuid'
-import { pgTable, text, integer, timestamp, boolean } from 'drizzle-orm/pg-core'
+import { pgTable, text, integer, timestamp, boolean, varchar } from 'drizzle-orm/pg-core'
+
+const id = cuid2('id')
 
 export const user = pgTable('user', {
-  id: cuid2('id').primaryKey().defaultRandom(),
+  id: id.primaryKey().defaultRandom(),
   name: text().notNull(),
   email: text().notNull().unique(),
   emailVerified: boolean().notNull(),
@@ -16,7 +18,7 @@ export const user = pgTable('user', {
 })
 
 export const session = pgTable('session', {
-  id: cuid2('id').primaryKey().defaultRandom(),
+  id: id.primaryKey().defaultRandom(),
   expiresAt: timestamp().notNull(),
   token: text().notNull().unique(),
   createdAt: timestamp().notNull(),
@@ -31,7 +33,7 @@ export const session = pgTable('session', {
 })
 
 export const account = pgTable('account', {
-  id: cuid2('id').primaryKey().defaultRandom(),
+  id: id.primaryKey().defaultRandom(),
   accountId: text().notNull(),
   providerId: text().notNull(),
   userId: text()
@@ -49,7 +51,7 @@ export const account = pgTable('account', {
 })
 
 export const verification = pgTable('verification', {
-  id: cuid2('id').primaryKey().defaultRandom(),
+  id: id.primaryKey().defaultRandom(),
   identifier: text().notNull(),
   value: text().notNull(),
   expiresAt: timestamp().notNull(),
@@ -58,7 +60,7 @@ export const verification = pgTable('verification', {
 })
 
 export const organization = pgTable('organization', {
-  id: cuid2('id').primaryKey().defaultRandom(),
+  id: id.primaryKey().defaultRandom(),
   name: text().notNull(),
   slug: text().unique(),
   logo: text(),
@@ -67,7 +69,7 @@ export const organization = pgTable('organization', {
 })
 
 export const member = pgTable('member', {
-  id: cuid2('id').primaryKey().defaultRandom(),
+  id: id.primaryKey().defaultRandom(),
   organizationId: text()
     .notNull()
     .references(() => organization.id),
@@ -79,7 +81,7 @@ export const member = pgTable('member', {
 })
 
 export const invitation = pgTable('invitation', {
-  id: cuid2('id').primaryKey().defaultRandom(),
+  id: id.primaryKey().defaultRandom(),
   organizationId: text()
     .notNull()
     .references(() => organization.id),
@@ -90,4 +92,22 @@ export const invitation = pgTable('invitation', {
   inviterId: text()
     .notNull()
     .references(() => user.id),
+})
+
+export const permission = pgTable('permission', {
+  id: id.primaryKey().defaultRandom(),
+  name: varchar({ length: 255 }).notNull(),
+  createdAt: timestamp().notNull().defaultNow(),
+})
+
+export const userPermission = pgTable('user_permission', {
+  id: id.primaryKey().defaultRandom(),
+  userId: text()
+    .notNull()
+    .references(() => user.id),
+  permissionId: text()
+    .notNull()
+    .references(() => permission.id),
+  createdAt: timestamp().notNull().defaultNow(),
+  updatedAt: timestamp().notNull().defaultNow(),
 })

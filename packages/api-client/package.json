@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@repo/shared",
+  "name": "@repo/api-client",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "type": "module",
@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@elysiajs/eden": "^1.2.0",
+    "@repo/api": "*",
     "elysia": "^1.2.2"
   }
 }

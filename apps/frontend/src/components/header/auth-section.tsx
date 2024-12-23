@@ -93,8 +93,6 @@ export function AuthSection() {
     )
   }
 
-  if (isPending) return <div></div>
-
   return (
     <div className="space-x-2">
       <Link

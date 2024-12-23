@@ -1,10 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { api, apiFetch } from '@repo/api-client'
+import { queryOptions, useQuery } from '@tanstack/react-query'
+import { queryClient } from '@/lib/query-client'
+
+// const blogQuery = queryOptions({
+//   queryKey: ['blogs'],
+//   queryFn: () => apiFetch('/api/blog/index', {}),
+// })
 
 export const Route = createFileRoute('/blog')({
   component: RouteComponent,
-  loader: () => {
-    document.title = 'Blok'
-  }
+  loader: async () => {
+    const blogs = await apiFetch('/api/blog', {})
+    console.log(blogs)
+  },
 })
 
 function RouteComponent() {
