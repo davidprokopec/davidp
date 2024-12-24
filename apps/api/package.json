@@ -12,11 +12,14 @@
     "@elysiajs/swagger": "^1.2.0",
     "@repo/drizzle-cuid": "*",
     "@repo/shared": "*",
+    "@tqman/nice-logger": "^1.0.7",
     "better-auth": "^1.1.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.2",
+    "drizzle-typebox": "^0.2.0",
     "elysia": "^1.2.2",
     "pg": "^8.13.1",
+    "sql-log-prettifier": "^0.1.2",
     "zod": "^3.24.1"
   },
   "devDependencies": {

@@ -140,6 +140,16 @@ function RouteComponent() {
               <Button
                 variant="outline"
                 className="w-full"
+                type="button"
+                onClick={() => socialSignIn.mutate({ provider: 'google' })}
+                disabled={socialSignIn.isPending}
+              >
+                <Google className="mr-2 h-4 w-4 stroke-white fill-white" />
+                Google
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
                 onClick={() => socialSignIn.mutate({ provider: 'github' })}
                 disabled={socialSignIn.isPending}
               >
@@ -159,10 +169,6 @@ function RouteComponent() {
               <Button variant="outline" className="w-full" type="button">
                 <Facebook className="mr-2 h-4 w-4 stroke-white fill-white" />
                 Facebook
-              </Button>
-              <Button variant="outline" className="w-full" type="button">
-                <Google className="mr-2 h-4 w-4 stroke-white fill-white" />
-                Google
               </Button>
             </div>
             <div className="mt-4 text-center">

@@ -12,22 +12,17 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as BlogImport } from './routes/blog'
-import { Route as AdminImport } from './routes/admin'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as AdminIndexImport } from './routes/admin/index'
 import { Route as AuthModeImport } from './routes/auth/$mode'
+import { Route as AdminUsersImport } from './routes/admin/users'
 
 // Create/Update Routes
 
 const BlogRoute = BlogImport.update({
   id: '/blog',
   path: '/blog',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const AdminRoute = AdminImport.update({
-  id: '/admin',
-  path: '/admin',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -43,9 +38,21 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AdminIndexRoute = AdminIndexImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AuthModeRoute = AuthModeImport.update({
   id: '/auth/$mode',
   path: '/auth/$mode',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AdminUsersRoute = AdminUsersImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -67,13 +74,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminImport
-      parentRoute: typeof rootRoute
-    }
     '/blog': {
       id: '/blog'
       path: '/blog'
@@ -81,11 +81,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogImport
       parentRoute: typeof rootRoute
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersImport
+      parentRoute: typeof rootRoute
+    }
     '/auth/$mode': {
       id: '/auth/$mode'
       path: '/auth/$mode'
       fullPath: '/auth/$mode'
       preLoaderRoute: typeof AuthModeImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -96,51 +110,69 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
   '/blog': typeof BlogRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/$mode': typeof AuthModeRoute
+  '/admin': typeof AdminIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
   '/blog': typeof BlogRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/$mode': typeof AuthModeRoute
+  '/admin': typeof AdminIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
   '/blog': typeof BlogRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/$mode': typeof AuthModeRoute
+  '/admin/': typeof AdminIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/admin' | '/blog' | '/auth/$mode'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/blog'
+    | '/admin/users'
+    | '/auth/$mode'
+    | '/admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/admin' | '/blog' | '/auth/$mode'
-  id: '__root__' | '/' | '/about' | '/admin' | '/blog' | '/auth/$mode'
+  to: '/' | '/about' | '/blog' | '/admin/users' | '/auth/$mode' | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/blog'
+    | '/admin/users'
+    | '/auth/$mode'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRoute
   BlogRoute: typeof BlogRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   AuthModeRoute: typeof AuthModeRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRoute,
   BlogRoute: BlogRoute,
+  AdminUsersRoute: AdminUsersRoute,
   AuthModeRoute: AuthModeRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -155,9 +187,10 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about",
-        "/admin",
         "/blog",
-        "/auth/$mode"
+        "/admin/users",
+        "/auth/$mode",
+        "/admin/"
       ]
     },
     "/": {
@@ -166,14 +199,17 @@ export const routeTree = rootRoute
     "/about": {
       "filePath": "about.tsx"
     },
-    "/admin": {
-      "filePath": "admin.tsx"
-    },
     "/blog": {
       "filePath": "blog.tsx"
     },
+    "/admin/users": {
+      "filePath": "admin/users.tsx"
+    },
     "/auth/$mode": {
       "filePath": "auth/$mode.tsx"
+    },
+    "/admin/": {
+      "filePath": "admin/index.tsx"
     }
   }
 }

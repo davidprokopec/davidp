@@ -10,4 +10,5 @@ const betterAuthView = (context: Context) => {
     context.error(405)
   }
 }
+
 export default betterAuthView

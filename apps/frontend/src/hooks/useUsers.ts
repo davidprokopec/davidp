@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { authClient } from '@/lib/auth-client'
 import { QueryKeys } from '@/lib/query-keys'
+import { useApi } from '@/providers/api-provider'
 
 export function useUsers() {
+  const api = useApi()
+
   return useQuery({
     queryKey: QueryKeys.users,
-    queryFn: () => authClient.admin.listUsers({ query: {} }),
+    queryFn: () => api.users.index.get(),
   })
 }

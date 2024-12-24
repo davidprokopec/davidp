@@ -6,8 +6,11 @@ import type { App } from '@repo/api'
  * remove the index from the url before sending the request
  */
 export const api = edenTreaty<App>('http://localhost:3000', {
-  fetcher(url, options) {
+  fetcher(url, options = {}) {
     url = url.toString().replace(/\/index$/, '')
-    return fetch(url, options)
+    return fetch(url, {
+      ...options,
+      credentials: 'include', // This ensures cookies are sent with requests
+    })
   },
 })

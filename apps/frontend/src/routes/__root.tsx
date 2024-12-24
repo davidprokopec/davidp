@@ -11,7 +11,6 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const { data: session, isPending, error } = useSession()
-  console.log('session', session)
 
   return (
     <>

@@ -1,8 +1,9 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { admin, genericOAuth, organization } from 'better-auth/plugins'
-import { getDb, schema } from '../../db'
 import env from '../../utils/env'
+import db from '../../db/connection'
+import { schema } from '../../db'
 
 export const auth = betterAuth({
   plugins: [
@@ -20,14 +21,13 @@ export const auth = betterAuth({
           redirectURI: 'http://localhost:3000/api/auth/oauth2/callback/seznam',
           scopes: ['identity', 'avatar'],
           mapProfileToUser: (profile) => {
-            console.log(profile)
             return profile
           },
         },
       ],
     }),
   ],
-  database: drizzleAdapter(getDb(), {
+  database: drizzleAdapter(db, {
     provider: 'pg',
     schema: {
       user: schema.user,
@@ -47,6 +47,10 @@ export const auth = betterAuth({
     github: {
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
+    },
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
 
     // facebook: {
