@@ -1,78 +1,92 @@
 import { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useUserMutations } from '@/hooks/useUserMutations'
+import { UserWithRole } from 'better-auth/plugins'
 
 interface EditUserModalProps {
   isOpen: boolean
   onClose: () => void
-  user: { id: number; name: string; email: string; role: string }
-  onSave: (updatedUser: { id: number; name: string; email: string; role: string }) => void
+  user: UserWithRole
 }
 
-export function EditUserModal({ isOpen, onClose, user, onSave }: EditUserModalProps) {
-  const [name, setName] = useState(user.name)
-  const [email, setEmail] = useState(user.email)
-  const [role, setRole] = useState(user.role)
+export function EditUserModal({ isOpen, onClose, user }: EditUserModalProps) {
+  const [formData, setFormData] = useState({
+    name: user.name || '',
+    email: user.email,
+    role: user.role || 'user',
+  })
+  const { updateUser } = useUserMutations()
 
-  const handleSave = () => {
-    onSave({ ...user, name, email, role })
-    onClose()
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    updateUser.mutate(
+      {
+        id: user.id,
+        ...formData,
+      },
+      {
+        onSuccess: () => {
+          onClose()
+        },
+      },
+    )
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit User: {user.name}</DialogTitle>
+          <DialogTitle>Edit User: {user.name || user.email}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
+        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="col-span-3"
+              value={formData.name}
+              onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+              placeholder="Enter name..."
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="email" className="text-right">
-              Email
-            </Label>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
             <Input
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="col-span-3"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+              placeholder="Enter email..."
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="role" className="text-right">
-              Role
-            </Label>
-            <Input
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="col-span-3"
-            />
+          <div className="space-y-2">
+            <Label htmlFor="role">Role</Label>
+            <Select
+              value={formData.role}
+              onValueChange={(value) => setFormData((prev) => ({ ...prev, role: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="user">User</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </div>
-        <DialogFooter>
-          <Button type="submit" onClick={handleSave}>
-            Save Changes
+          <Button type="submit" className="w-full" disabled={updateUser.isPending}>
+            {updateUser.isPending ? 'Saving...' : 'Save Changes'}
           </Button>
-        </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

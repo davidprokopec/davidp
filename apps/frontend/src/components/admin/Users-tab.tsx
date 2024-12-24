@@ -14,25 +14,23 @@ import { Button } from '@/components/ui/button'
 import { BanUserModal } from './user-modals/Ban'
 import { UserSessionsModal } from './user-modals/Sessions'
 import { EditUserModal } from './user-modals/Edit'
-
-// Mock user data
-const mockUsers = [
-  { id: 1, name: 'John Doe', email: 'john@example.com', role: 'User' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Admin' },
-  // Add more mock users as needed
-]
+import { useUsers } from '@/hooks/useUsers'
+import { Badge } from '@/components/ui/badge'
+import { formatDistanceToNow } from 'date-fns'
+import { Users } from '@repo/shared'
 
 export function UsersTab() {
-  const [users, setUsers] = useState(mockUsers)
+  const { data } = useUsers()
+  const users = data?.data?.users || []
   const [searchTerm, setSearchTerm] = useState('')
-  const [sortColumn, setSortColumn] = useState('name')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
-  const [selectedUser, setSelectedUser] = useState<(typeof mockUsers)[0] | null>(null)
+  const [sortColumn, setSortColumn] = useState<keyof Users.User>('lastActive')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  const [selectedUser, setSelectedUser] = useState<Users.User | null>(null)
   const [isBanModalOpen, setIsBanModalOpen] = useState(false)
   const [isSessionsModalOpen, setIsSessionsModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  const handleSort = (column: string) => {
+  const handleSort = (column: keyof Users.User) => {
     if (column === sortColumn) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
     } else {
@@ -41,20 +39,31 @@ export function UsersTab() {
     }
   }
 
+  const formatDate = (date: Date | string | null) => {
+    if (!date) return 'Never'
+    return formatDistanceToNow(new Date(date), { addSuffix: true })
+  }
+
   const filteredUsers = users
-    .filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.role.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
+    .filter((user) => {
+      const searchLower = searchTerm.toLowerCase()
+      return (
+        user.name?.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower) ||
+        user.role?.toLowerCase().includes(searchLower)
+      )
+    })
     .sort((a, b) => {
-      const aValue = a[sortColumn as keyof typeof a]
-      const bValue = b[sortColumn as keyof typeof b]
+      const aValue = a[sortColumn]?.toString() || ''
+      const bValue = b[sortColumn]?.toString() || ''
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
       return 0
     })
+
+  if (!data) {
+    return <div className="p-4">Loading users...</div>
+  }
 
   return (
     <div className="p-4">
@@ -62,45 +71,73 @@ export function UsersTab() {
         placeholder="Search users..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="mb-4"
+        className="mb-4 bg-background border-input"
       />
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="hover:bg-muted/50">
             <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
-              Name
+              Name {sortColumn === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
             </TableHead>
             <TableHead onClick={() => handleSort('email')} className="cursor-pointer">
-              Email
+              Email {sortColumn === 'email' && (sortDirection === 'asc' ? '↑' : '↓')}
             </TableHead>
             <TableHead onClick={() => handleSort('role')} className="cursor-pointer">
-              Role
+              Role {sortColumn === 'role' && (sortDirection === 'asc' ? '↑' : '↓')}
             </TableHead>
+            <TableHead onClick={() => handleSort('createdAt')} className="cursor-pointer">
+              Created {sortColumn === 'createdAt' && (sortDirection === 'asc' ? '↑' : '↓')}
+            </TableHead>
+            <TableHead onClick={() => handleSort('lastActive')} className="cursor-pointer">
+              Last Active {sortColumn === 'lastActive' && (sortDirection === 'asc' ? '↑' : '↓')}
+            </TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredUsers.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.name}</TableCell>
+            <TableRow key={user.id} className="hover:bg-muted/50">
+              <TableCell>{user.name || 'N/A'}</TableCell>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role}</TableCell>
+              <TableCell className="capitalize">{user.role || 'user'}</TableCell>
+              <TableCell>{formatDate(user.createdAt)}</TableCell>
+              <TableCell>{formatDate(user.lastActive)}</TableCell>
+              <TableCell>
+                {user.banned ? (
+                  <Badge variant="destructive">
+                    Banned
+                    {user.banExpires
+                      ? ` until ${new Date(user.banExpires).toLocaleString('en-GB', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false,
+                        })}`
+                      : ' Forever'}
+                  </Badge>
+                ) : (
+                  <Badge variant="default">Active</Badge>
+                )}
+              </TableCell>
               <TableCell>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="mr-2"
+                  className="mr-2 hover:bg-destructive hover:text-destructive-foreground"
                   onClick={() => {
                     setSelectedUser(user)
                     setIsBanModalOpen(true)
                   }}
                 >
-                  Ban
+                  {user.banned ? 'Update Ban' : 'Ban'}
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="mr-2"
+                  className="mr-2 hover:bg-primary hover:text-primary-foreground"
                   onClick={() => {
                     setSelectedUser(user)
                     setIsSessionsModalOpen(true)
@@ -111,6 +148,7 @@ export function UsersTab() {
                 <Button
                   variant="outline"
                   size="sm"
+                  className="hover:bg-secondary hover:text-secondary-foreground"
                   onClick={() => {
                     setSelectedUser(user)
                     setIsEditModalOpen(true)
@@ -140,10 +178,6 @@ export function UsersTab() {
             isOpen={isEditModalOpen}
             onClose={() => setIsEditModalOpen(false)}
             user={selectedUser}
-            onSave={(updatedUser) => {
-              setUsers(users.map((u) => (u.id === updatedUser.id ? updatedUser : u)))
-              setIsEditModalOpen(false)
-            }}
           />
         </>
       )}

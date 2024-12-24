@@ -23,6 +23,7 @@ export const config = [
       "prettier/prettier": "warn",
       "turbo/no-undeclared-env-vars": "warn",
       "no-unused-vars": "off",
+      "@typescript-eslint/no-namespace": "off"
       // 'sort-imports': 'warn',
     },
   },
