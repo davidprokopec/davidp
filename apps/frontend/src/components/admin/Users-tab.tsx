@@ -10,6 +10,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { BanUserModal } from './user-modals/Ban'
 import { UserSessionsModal } from './user-modals/Sessions'
@@ -18,6 +24,20 @@ import { useUsers } from '@/hooks/useUsers'
 import { Badge } from '@/components/ui/badge'
 import { formatDistanceToNow } from 'date-fns'
 import { Users } from '@repo/shared'
+import { MoreHorizontal, Ban, Users as UsersIcon, Edit } from 'lucide-react'
+import { Route as AdminRoute } from '@/routes/admin/$tab'
+import { useUserMutations } from '@/hooks/useUserMutations'
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 export function UsersTab() {
   const { data } = useUsers()
@@ -25,10 +45,14 @@ export function UsersTab() {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortColumn, setSortColumn] = useState<keyof Users.User>('lastActive')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
-  const [selectedUser, setSelectedUser] = useState<Users.User | null>(null)
-  const [isBanModalOpen, setIsBanModalOpen] = useState(false)
-  const [isSessionsModalOpen, setIsSessionsModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const { banUser } = useUserMutations()
+  const [showUnbanConfirm, setShowUnbanConfirm] = useState(false)
+  const [userToUnban, setUserToUnban] = useState<Users.User | null>(null)
+
+  const { modal, userId } = AdminRoute.useSearch()
+  const navigate = AdminRoute.useNavigate()
+
+  const selectedUser = userId ? users.find((u) => u.id === userId) : null
 
   const handleSort = (column: keyof Users.User) => {
     if (column === sortColumn) {
@@ -42,6 +66,51 @@ export function UsersTab() {
   const formatDate = (date: Date | string | null) => {
     if (!date) return 'Never'
     return formatDistanceToNow(new Date(date), { addSuffix: true })
+  }
+
+  const openModal = (modalType: 'ban' | 'sessions' | 'edit', user: Users.User) => {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        modal: modalType,
+        userId: user.id,
+      }),
+      replace: true,
+    })
+  }
+
+  const closeModal = () => {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        modal: undefined,
+        userId: undefined,
+      }),
+      replace: true,
+    })
+  }
+
+  const handleBanAction = (user: Users.User) => {
+    if (user.banned) {
+      setUserToUnban(user)
+      setShowUnbanConfirm(true)
+    } else {
+      openModal('ban', user)
+    }
+  }
+
+  const handleUnban = () => {
+    if (userToUnban) {
+      banUser.mutate(
+        { userId: userToUnban.id, reason: 'Unbanned by administrator', expiresAt: null },
+        {
+          onSuccess: () => {
+            setShowUnbanConfirm(false)
+            setUserToUnban(null)
+          },
+        },
+      )
+    }
   }
 
   const filteredUsers = users
@@ -123,39 +192,30 @@ export function UsersTab() {
                 )}
               </TableCell>
               <TableCell>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mr-2 hover:bg-destructive hover:text-destructive-foreground"
-                  onClick={() => {
-                    setSelectedUser(user)
-                    setIsBanModalOpen(true)
-                  }}
-                >
-                  {user.banned ? 'Update Ban' : 'Ban'}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mr-2 hover:bg-primary hover:text-primary-foreground"
-                  onClick={() => {
-                    setSelectedUser(user)
-                    setIsSessionsModalOpen(true)
-                  }}
-                >
-                  Sessions
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="hover:bg-secondary hover:text-secondary-foreground"
-                  onClick={() => {
-                    setSelectedUser(user)
-                    setIsEditModalOpen(true)
-                  }}
-                >
-                  Edit
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() => handleBanAction(user)}
+                      className="text-destructive"
+                    >
+                      <Ban className="mr-2 h-4 w-4" />
+                      {user.banned ? 'Unban' : 'Ban'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openModal('sessions', user)}>
+                      <UsersIcon className="mr-2 h-4 w-4" />
+                      Sessions
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openModal('edit', user)}>
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}
@@ -164,23 +224,31 @@ export function UsersTab() {
 
       {selectedUser && (
         <>
-          <BanUserModal
-            isOpen={isBanModalOpen}
-            onClose={() => setIsBanModalOpen(false)}
-            user={selectedUser}
-          />
+          <BanUserModal isOpen={modal === 'ban'} onClose={closeModal} user={selectedUser} />
           <UserSessionsModal
-            isOpen={isSessionsModalOpen}
-            onClose={() => setIsSessionsModalOpen(false)}
+            isOpen={modal === 'sessions'}
+            onClose={closeModal}
             user={selectedUser}
           />
-          <EditUserModal
-            isOpen={isEditModalOpen}
-            onClose={() => setIsEditModalOpen(false)}
-            user={selectedUser}
-          />
+          <EditUserModal isOpen={modal === 'edit'} onClose={closeModal} user={selectedUser} />
         </>
       )}
+
+      <AlertDialog open={showUnbanConfirm} onOpenChange={setShowUnbanConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Unban</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to unban {userToUnban?.name || userToUnban?.email}? This will
+              immediately restore their access to the platform.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setUserToUnban(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleUnban}>Unban User</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

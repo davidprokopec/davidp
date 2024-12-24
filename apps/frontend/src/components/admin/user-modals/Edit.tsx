@@ -80,6 +80,7 @@ export function EditUserModal({ isOpen, onClose, user }: EditUserModalProps) {
               <SelectContent>
                 <SelectItem value="user">User</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="owner">Owner</SelectItem>
               </SelectContent>
             </Select>
           </div>

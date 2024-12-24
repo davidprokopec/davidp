@@ -9,8 +9,14 @@ const adminPageSearchSchema = z.object({
   tab: z.enum(['users', 'blogs', 'settings']).optional().default('users'),
 })
 
+const adminPageSearchParamsSchema = z.object({
+  modal: z.enum(['ban', 'sessions', 'edit']).optional(),
+  userId: z.string().optional(),
+})
+
 export const Route = createFileRoute('/admin/$tab')({
   component: RouteComponent,
+  validateSearch: adminPageSearchParamsSchema,
   loader: ({ params }) => {
     const { tab } = adminPageSearchSchema.parse(params)
     return { tab }

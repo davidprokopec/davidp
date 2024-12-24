@@ -15,6 +15,7 @@ import { Button } from '../ui/button'
 import { useSession } from '@/hooks/useSession'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { QueryKeys, MutationKeys } from '@/lib/query-keys'
+import { Roles } from '@repo/shared'
 
 export function AuthSection() {
   const { data: session, isPending, error } = useSession()
@@ -66,7 +67,7 @@ export function AuthSection() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {session.user.role === 'admin' && (
+            {session.user.role && Roles.adminRoles.includes(session.user.role) && (
               <Link to="/admin/$tab" params={{ tab: 'users' }}>
                 <DropdownMenuItem>
                   <Eye className="mr-2 h-4 w-4" />

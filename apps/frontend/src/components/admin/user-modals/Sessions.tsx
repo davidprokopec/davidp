@@ -41,7 +41,7 @@ export function UserSessionsModal({ isOpen, onClose, user }: UserSessionsModalPr
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-muted/50">
-              <TableHead>Device</TableHead>
+              <TableHead>User agent</TableHead>
               <TableHead>IP Address</TableHead>
               <TableHead>Last Active</TableHead>
               <TableHead>Action</TableHead>
@@ -61,11 +61,11 @@ export function UserSessionsModal({ isOpen, onClose, user }: UserSessionsModalPr
                 </TableCell>
               </TableRow>
             ) : (
-              sessions?.sessions?.map((session) => (
+              sessions?.map((session) => (
                 <TableRow key={session.id} className="hover:bg-muted/50">
-                  <TableCell>{session.device}</TableCell>
+                  <TableCell>{session.userAgent}</TableCell>
                   <TableCell>{session.ipAddress || 'Unknown'}</TableCell>
-                  <TableCell>{new Date(session.lastActive).toLocaleString()}</TableCell>
+                  <TableCell>{new Date(session.updatedAt).toLocaleString()}</TableCell>
                   <TableCell>
                     <Button
                       variant="destructive"

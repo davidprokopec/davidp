@@ -46,9 +46,8 @@ export function useUserMutations(userId?: string) {
   })
 
   const banUser = useMutation({
-    mutationFn: async ({ id, ...data }: BanUserData & { id: string }) => {
-      console.log(api)
-      const response = await api.users({ id }).ban.patch({ ...data })
+    mutationFn: async ({ userId, ...data }: BanUserData & { userId: string }) => {
+      const response = await api.users({ id: userId }).ban.patch({ ...data })
       return response.data
     },
     onSuccess: () => {
@@ -61,7 +60,7 @@ export function useUserMutations(userId?: string) {
     queryFn: async () => {
       if (!userId) return []
       const response = await authClient.admin.listUserSessions({ userId })
-      return response.data
+      return response.data?.sessions
     },
     enabled: !!userId,
   })

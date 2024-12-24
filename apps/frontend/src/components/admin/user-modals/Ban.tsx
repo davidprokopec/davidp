@@ -27,7 +27,7 @@ export function BanUserModal({ isOpen, onClose, user }: BanUserModalProps) {
   const handleBan = () => {
     banUser.mutate(
       {
-        id: user.id,
+        userId: user.id,
         reason: banReason,
         expiresAt: isUnban ? null : isForever ? undefined : banDate?.toISOString(),
       },
