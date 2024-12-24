@@ -14,6 +14,4 @@ export namespace Roles {
   }
 
   export const adminRoles = [Roles.admin, Roles.owner] as string[]
-
-  export const isAdmin = (role: string | null | undefined) => adminRoles.includes(role)
 }
