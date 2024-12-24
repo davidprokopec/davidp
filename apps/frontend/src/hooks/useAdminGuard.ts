@@ -10,6 +10,9 @@ export function useAdminGuard() {
     if (!isPending && session && session.user.role !== 'admin') {
       navigate({ to: '/', replace: true })
     }
+    if (!session) {
+      navigate({ to: '/auth/$mode', params: { mode: 'login' }, replace: true })
+    }
   }, [session, navigate, isPending])
 
   return { session, isPending }

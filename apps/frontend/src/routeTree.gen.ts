@@ -14,9 +14,8 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as BlogImport } from './routes/blog'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
-import { Route as AdminIndexImport } from './routes/admin/index'
 import { Route as AuthModeImport } from './routes/auth/$mode'
-import { Route as AdminUsersImport } from './routes/admin/users'
+import { Route as AdminTabImport } from './routes/admin/$tab'
 
 // Create/Update Routes
 
@@ -38,21 +37,15 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AdminIndexRoute = AdminIndexImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const AuthModeRoute = AuthModeImport.update({
   id: '/auth/$mode',
   path: '/auth/$mode',
   getParentRoute: () => rootRoute,
 } as any)
 
-const AdminUsersRoute = AdminUsersImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
+const AdminTabRoute = AdminTabImport.update({
+  id: '/admin/$tab',
+  path: '/admin/$tab',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -81,11 +74,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogImport
       parentRoute: typeof rootRoute
     }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/admin/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersImport
+    '/admin/$tab': {
+      id: '/admin/$tab'
+      path: '/admin/$tab'
+      fullPath: '/admin/$tab'
+      preLoaderRoute: typeof AdminTabImport
       parentRoute: typeof rootRoute
     }
     '/auth/$mode': {
@@ -93,13 +86,6 @@ declare module '@tanstack/react-router' {
       path: '/auth/$mode'
       fullPath: '/auth/$mode'
       preLoaderRoute: typeof AuthModeImport
-      parentRoute: typeof rootRoute
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -111,18 +97,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/$tab': typeof AdminTabRoute
   '/auth/$mode': typeof AuthModeRoute
-  '/admin': typeof AdminIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/$tab': typeof AdminTabRoute
   '/auth/$mode': typeof AuthModeRoute
-  '/admin': typeof AdminIndexRoute
 }
 
 export interface FileRoutesById {
@@ -130,30 +114,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/$tab': typeof AdminTabRoute
   '/auth/$mode': typeof AuthModeRoute
-  '/admin/': typeof AdminIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/about'
-    | '/blog'
-    | '/admin/users'
-    | '/auth/$mode'
-    | '/admin'
+  fullPaths: '/' | '/about' | '/blog' | '/admin/$tab' | '/auth/$mode'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/blog' | '/admin/users' | '/auth/$mode' | '/admin'
-  id:
-    | '__root__'
-    | '/'
-    | '/about'
-    | '/blog'
-    | '/admin/users'
-    | '/auth/$mode'
-    | '/admin/'
+  to: '/' | '/about' | '/blog' | '/admin/$tab' | '/auth/$mode'
+  id: '__root__' | '/' | '/about' | '/blog' | '/admin/$tab' | '/auth/$mode'
   fileRoutesById: FileRoutesById
 }
 
@@ -161,18 +131,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   BlogRoute: typeof BlogRoute
-  AdminUsersRoute: typeof AdminUsersRoute
+  AdminTabRoute: typeof AdminTabRoute
   AuthModeRoute: typeof AuthModeRoute
-  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   BlogRoute: BlogRoute,
-  AdminUsersRoute: AdminUsersRoute,
+  AdminTabRoute: AdminTabRoute,
   AuthModeRoute: AuthModeRoute,
-  AdminIndexRoute: AdminIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -188,9 +156,8 @@ export const routeTree = rootRoute
         "/",
         "/about",
         "/blog",
-        "/admin/users",
-        "/auth/$mode",
-        "/admin/"
+        "/admin/$tab",
+        "/auth/$mode"
       ]
     },
     "/": {
@@ -202,14 +169,11 @@ export const routeTree = rootRoute
     "/blog": {
       "filePath": "blog.tsx"
     },
-    "/admin/users": {
-      "filePath": "admin/users.tsx"
+    "/admin/$tab": {
+      "filePath": "admin/$tab.tsx"
     },
     "/auth/$mode": {
       "filePath": "auth/$mode.tsx"
-    },
-    "/admin/": {
-      "filePath": "admin/index.tsx"
     }
   }
 }

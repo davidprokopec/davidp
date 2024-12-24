@@ -67,7 +67,7 @@ export function AuthSection() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             {session.user.role === 'admin' && (
-              <Link to="/admin">
+              <Link to="/admin/$tab" params={{ tab: 'users' }}>
                 <DropdownMenuItem>
                   <Eye className="mr-2 h-4 w-4" />
                   <span>admin</span>
